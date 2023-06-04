@@ -2,6 +2,7 @@ package com.example.rememberme.service;
 
 import com.example.rememberme.config.BotConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -13,6 +14,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class BotService extends TelegramLongPollingBot {
 
     private final BotConfig botConfig;
+    @Value("${bot.enable}")
+    private boolean enable;
 
     @Override
     public String getBotUsername() {
@@ -38,6 +41,7 @@ public class BotService extends TelegramLongPollingBot {
     }
 
     public void sendMessage(Long chatId, String messageText) throws TelegramApiException {
+        if (!enable) return;
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(messageText);

@@ -1,5 +1,6 @@
 package com.example.rememberme.model;
 
+import com.example.rememberme.api.MessageStatus;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -13,4 +14,5 @@ public class Message {
     private Boolean isRead;
     private Boolean isDeleted;
     private Boolean isDelivered;
+    private MessageStatus status;
 }

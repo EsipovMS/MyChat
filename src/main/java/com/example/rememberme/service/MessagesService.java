@@ -1,6 +1,7 @@
 package com.example.rememberme.service;
 
 import com.example.rememberme.api.MessageRs;
+import com.example.rememberme.api.MessageStatus;
 import com.example.rememberme.mappers.MessagesMapper;
 import com.example.rememberme.model.Message;
 import com.example.rememberme.model.Notification;
@@ -38,6 +39,7 @@ public class MessagesService {
         message.setIsRead(false);
         message.setTime(new Timestamp(System.currentTimeMillis()));
         message.setAuthorId(author.getId());
+        message.setStatus(MessageStatus.SEND);
         messageRepository.save(message);
         MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, true);
         sendNotification(message);

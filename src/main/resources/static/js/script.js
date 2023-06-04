@@ -1,16 +1,26 @@
 let messagesList = $('.message-holder');
 const mediaQuery = window.matchMedia('(max-width: 768px)');
-
-
+let resScroll;
+let scrollHeight;
+let block;
+getScroll();
 setupBurgerButton();
 becomeMessages();
 setMessageBlockHeight();
 getChatDetails();
 setSendButton();
-setTimeout(setScroll, 100);
+
+function getScroll() {
+    block = document.querySelector('#messages_block');
+    if (block === null) return;
+    $('#messages_block').scroll(function () {
+        scrollHeight = block.scrollHeight;
+        resScroll = parseInt(block.style.height.replace('px', '')) + block.scrollTop;
+    })
+}
 
 function setScroll() {
-    let block = document.querySelector('#messages_block');
+    block = document.querySelector('#messages_block');
     if (block === null) return;
     block.scroll(0, Number.MAX_SAFE_INTEGER);
 }
@@ -25,8 +35,7 @@ function setSendButton() {
             url: '/messages',
             data: {textMessage: messageField.value, _csrf : token}
         })
-        setTimeout(() => getMessages(), 100);
-        setTimeout(setScroll, 300);
+        getMessages(true);
         messageField.value = "";
     })
 }
@@ -36,9 +45,9 @@ function setControls() {
     $(document).on("click", ".message-controls", function () {
 
         let messageId = this.parentNode.parentNode.id;
-        if (confirm("Действительно хотите удалит сообщение?")) {
+        if (confirm("Действительно хотите удалить сообщение?")) {
             deleteMessage(messageId);
-            setTimeout(() => getMessages(), 100);
+            setTimeout(() => getMessages(false), 100);
         }
     })
 }
@@ -55,28 +64,27 @@ function deleteMessage(messageId) {
 window.addEventListener('resize', function(event){
     calcMessageBoxSize();
 })
-
-function setupControls() {
-    let messageControls = messagesList.filter(".message-controls");
-    messageControls.each(function () {
-        console.log($(this).parent());
-    })
-    if(messageControls == null) return;
-    messageControls.each(function (){
-        console.log($(this));
-        $(document).on("click", ".message-controls", function () {
-            let parent = $(this).parentNode;
-            console.log(parent);
-            let display = parent.querySelector(".message-controls-display");
-            switchDisplay(display);
-        });
-    });
-}
+//
+// function setupControls() {
+//     let messageControls = messagesList.filter(".message-controls");
+//     messageControls.each(function () {
+//         console.log($(this).parent());
+//     })
+//     if(messageControls == null) return;
+//     messageControls.each(function (){
+//         console.log($(this));
+//         $(document).on("click", ".message-controls", function () {
+//             let parent = $(this).parentNode;
+//             console.log(parent);
+//             let display = parent.querySelector(".message-controls-display");
+//             switchDisplay(display);
+//         });
+//     });
+// }
 
 function switchDisplay(el) {
     let style = window.getComputedStyle(el);
     let display = style.getPropertyValue('display');
-    console.log("switch");
     if (display === 'none') {
         el.style.display = 'block';
     } else {
@@ -139,7 +147,7 @@ function getChatDetails() {
     });
 }
 
-function getMessages() {
+function getMessages(scrollDown) {
     const messagesBlock = document.querySelector('#messages_block');
     if (messagesBlock == null) return;
     var token = $("meta[name='_csrf']").attr("content");
@@ -149,10 +157,12 @@ function getMessages() {
         data: {_csrf : token},
         success: function (result) {
             $('#messages_block').html(getMessagesHtml(result));
+            if (scrollDown) setScroll();
+            if (scrollHeight - resScroll >= 20) return;
+            setScroll();
         }
     });
     setControls();
-    // setTimeout(() => setScroll(), 100);
 }
 
 function getMessagesHtml(result) {
@@ -174,6 +184,7 @@ function getMessagesHtml(result) {
             "            </div>\n" +
             "            <div class=\"message-text\">" + `${messageRsItem.messageText}` + "</div>\n" +
             "            <div class=\"message-date-time\">" + `${messageRsItem.time}` + "</div>\n" +
+            "            <div class=\"message-status\">" + `${messageRsItem.status}` + "</div>\n" +
             "        </div>\n" +
             "    </div>"
     }
@@ -182,8 +193,8 @@ function getMessagesHtml(result) {
 }
 
 function becomeMessages() {
-    getMessages();
-    setInterval(() => getMessages(), 1500);
+    getMessages(false);
+    setInterval(() => getMessages(false), 1500);
 }
 
 function setMessageBlockHeight() {

@@ -11,4 +11,5 @@ public class MessageRs {
     private Boolean isRead;
     private Boolean isDeleted;
     private Boolean isDelivered;
+    private MessageStatus status;
 }

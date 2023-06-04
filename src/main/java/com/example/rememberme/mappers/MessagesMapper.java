@@ -17,5 +17,6 @@ public interface MessagesMapper {
 
     @Mapping(target = "income", source = "income")
     @Mapping(target = "id", source = "message.id")
+    @Mapping(target = "status", source = "message.status")
     MessageRs toDTO(Message message, boolean income);
 }
