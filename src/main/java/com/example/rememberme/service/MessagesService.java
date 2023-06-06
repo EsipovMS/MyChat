@@ -84,7 +84,7 @@ public class MessagesService {
             income = message.getAuthorId() == me.getId();
             MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
-            messageRs.setTime(formatter.format(message.getTime().toLocalDateTime()));
+            messageRs.setTime(formatter.format(message.getTime().toLocalDateTime().plusHours(5)));
             messageRsList.add(messageRs);
         }
         return messageRsList;
