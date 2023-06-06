@@ -9,13 +9,20 @@ import com.example.rememberme.model.Person;
 import com.example.rememberme.repository.MessageRepository;
 import com.example.rememberme.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,10 +61,10 @@ public class MessagesService {
         long id;
         if (message.getAuthorId() == 1L) {
             id = 2L;
-            botService.sendMessage(2086960389L, "Новое сообщение");
+            botService.sendMessage(2086960389L, message.getMessageText());
         } else {
             id = 1L;
-            botService.sendMessage(1004065640L, "Новое сообщение");
+            botService.sendMessage(1004065640L, message.getMessageText());
         }
         notification.setPersonId(id);
         notificationService.setNotification(notification);
@@ -72,6 +79,8 @@ public class MessagesService {
             boolean income;
             income = message.getAuthorId() == me.getId();
             MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy hh:mm");
+            messageRs.setTime(formatter.format(message.getTime().toLocalDateTime()));
             messageRsList.add(messageRs);
         }
         return messageRsList;
@@ -86,7 +95,28 @@ public class MessagesService {
         messageRepository.delete(message);
         boolean income = false;
         if (message.getAuthorId() == 1L) income = false;
-        MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
-        return messageRs;
+        return MessagesMapper.INSTANCE.toDTO(message, income);
+    }
+
+    public List<MessageRs> readMessages(String messagesToRead) throws ParseException {
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(messagesToRead);
+        JSONArray messagesToReadArr = (JSONArray)obj;
+        Person me = personRepository.findByUsername(authService.getCurrentUsername());
+        List<Long> messagesToReadIds = new ArrayList<>();
+        for (Object o : messagesToReadArr) {
+            Long id = Long.parseLong(o.toString());
+            messagesToReadIds.add(id);
+        }
+        messageRepository.updateAllById(messagesToReadIds);
+        List<MessageRs> messageRsList = new ArrayList<>();
+        for (Long aLong : messagesToReadIds) {
+            Message message = messageRepository.findById(aLong);
+            boolean income;
+            income = message.getAuthorId() == me.getId();
+            MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
+            messageRsList.add(messageRs);
+        }
+        return messageRsList;
     }
 }

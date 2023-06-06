@@ -64,23 +64,6 @@ function deleteMessage(messageId) {
 window.addEventListener('resize', function(event){
     calcMessageBoxSize();
 })
-//
-// function setupControls() {
-//     let messageControls = messagesList.filter(".message-controls");
-//     messageControls.each(function () {
-//         console.log($(this).parent());
-//     })
-//     if(messageControls == null) return;
-//     messageControls.each(function (){
-//         console.log($(this));
-//         $(document).on("click", ".message-controls", function () {
-//             let parent = $(this).parentNode;
-//             console.log(parent);
-//             let display = parent.querySelector(".message-controls-display");
-//             switchDisplay(display);
-//         });
-//     });
-// }
 
 function switchDisplay(el) {
     let style = window.getComputedStyle(el);
@@ -172,10 +155,22 @@ function getMessagesHtml(result) {
     for (let messageRsItem of result) {
         let income = "";
         if (messageRsItem.income) {
-            income = " income"
+            income = "income"
         }
+
+        let readStatus = "";
+
+        if (messageRsItem.status !== "READ") {
+            readStatus = "unread ";
+        }
+
+        let statusString = "";
+        if (messageRsItem.income) {
+            statusString = "<div class=\"message-status\">" + `${messageRsItem.status}` + "</div>\n"
+        }
+
         messagesHtml += "    <div id=\"" + `${messageRsItem.id}` + "\" class=\"message-holder\">\n" +
-            "        <div class=\"message-body" + `${income}` + "\">\n" +
+            "        <div class=\"message-body " + `${readStatus}` + `${income}` + "\">\n" +
             "            <div class=\"message-controls\">&rsaquo;</div>\n" +
             "            <div class=\"message-controls-display\">\n" +
             "                <a href=\"#\">\n" +
@@ -184,7 +179,7 @@ function getMessagesHtml(result) {
             "            </div>\n" +
             "            <div class=\"message-text\">" + `${messageRsItem.messageText}` + "</div>\n" +
             "            <div class=\"message-date-time\">" + `${messageRsItem.time}` + "</div>\n" +
-            "            <div class=\"message-status\">" + `${messageRsItem.status}` + "</div>\n" +
+            statusString             +
             "        </div>\n" +
             "    </div>"
     }

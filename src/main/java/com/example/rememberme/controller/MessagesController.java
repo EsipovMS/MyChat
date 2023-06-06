@@ -3,6 +3,9 @@ package com.example.rememberme.controller;
 import com.example.rememberme.api.MessageRs;
 import com.example.rememberme.service.MessagesService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.json.ParseException;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.springframework.web.bind.annotation.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -33,5 +36,10 @@ public class MessagesController {
     @DeleteMapping("/messages/{id}")
     public MessageRs deleteMessage(@PathVariable Long id) {
         return messagesService.deleteMessage(id);
+    }
+
+    @PostMapping("/readMessages")
+    public List<MessageRs> readMessages(@RequestParam String messagesToRead) throws org.json.simple.parser.ParseException {
+        return messagesService.readMessages(messagesToRead);
     }
 }

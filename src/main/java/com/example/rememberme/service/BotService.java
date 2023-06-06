@@ -44,7 +44,8 @@ public class BotService extends TelegramLongPollingBot {
         if (!enable) return;
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        message.setText(messageText);
+        String text = messageText + " \n\nhttp://45.90.34.91";
+        message.setText(text);
         execute(message);
     }
 }

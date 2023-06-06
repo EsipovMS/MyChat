@@ -1,5 +1,6 @@
 package com.example.rememberme.repository;
 
+import com.example.rememberme.api.MessageStatus;
 import com.example.rememberme.model.Message;
 import org.springframework.stereotype.Repository;
 
@@ -49,5 +50,12 @@ public class MessageRepository {
 
     public void delete(Message message) {
         messages.remove(message);
+    }
+
+    public void updateAllById(List<Long> messagesToRead) {
+        for (Message message : messages) {
+            if (!messagesToRead.contains(message.getId())) continue;
+            message.setStatus(MessageStatus.READ);
+        }
     }
 }
