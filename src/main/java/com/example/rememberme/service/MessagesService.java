@@ -17,11 +17,15 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,10 +65,10 @@ public class MessagesService {
         long id;
         if (message.getAuthorId() == 1L) {
             id = 2L;
-            botService.sendMessage(2086960389L, message.getMessageText());
+            botService.sendMessage(2086960389L, "Новое сообщение");
         } else {
             id = 1L;
-            botService.sendMessage(1004065640L, message.getMessageText());
+            botService.sendMessage(1004065640L, "Новое сообщение");
         }
         notification.setPersonId(id);
         notificationService.setNotification(notification);
@@ -79,7 +83,7 @@ public class MessagesService {
             boolean income;
             income = message.getAuthorId() == me.getId();
             MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy hh:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
             messageRs.setTime(formatter.format(message.getTime().toLocalDateTime()));
             messageRsList.add(messageRs);
         }
