@@ -35,7 +35,7 @@ a{
     left: 39px;
 }
 .new_message{
-    line-height: 12px;
+    line-height: 20px;
     width: 77%;
     border-radius: 7px;
     padding: 7px;
@@ -80,6 +80,13 @@ a{
     border-radius: 7px;
     box-shadow: black 1px 1px 1px;
     margin: 10px;
+}
+.indicator {
+    margin-bottom: 2px;
+    height: 18px;
+}
+#typing_status{
+    margin-bottom: 8px;
 }
 .message-controls {
     content: "\203A";

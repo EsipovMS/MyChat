@@ -35,6 +35,7 @@ function setSendButton() {
             url: '/messages',
             data: {textMessage: messageField.value, _csrf : token}
         })
+        setTypingStatus(false);
         getMessages(true);
         messageField.value = "";
     })
