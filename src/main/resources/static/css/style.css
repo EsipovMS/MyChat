@@ -72,6 +72,15 @@ a{
     margin-left: auto;
     background-color: azure;
 }
+.add_file {
+    background: darkseagreen;
+    width: 75px;
+    height: 45px;
+    font-size: 24px;
+    border-radius: 7px;
+    box-shadow: black 1px 1px 1px;
+    margin: 10px;
+}
 .send_button {
     background: darkseagreen;
     width: 190px;
@@ -139,6 +148,13 @@ a{
 }
 .chatbox__header-info {
     width: 100%;
+}
+.image-holder {
+
+}
+.message-image {
+    max-width: 250px;
+    max-height: 400px;
 }
 @media (max-width: 700px) {
     footer{

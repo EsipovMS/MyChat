@@ -12,4 +12,5 @@ public class MessageRs {
     private Boolean isDeleted;
     private Boolean isDelivered;
     private MessageStatus status;
+    private Long imageId;
 }

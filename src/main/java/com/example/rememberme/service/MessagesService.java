@@ -3,9 +3,11 @@ package com.example.rememberme.service;
 import com.example.rememberme.api.MessageRs;
 import com.example.rememberme.api.MessageStatus;
 import com.example.rememberme.mappers.MessagesMapper;
+import com.example.rememberme.model.Image;
 import com.example.rememberme.model.Message;
 import com.example.rememberme.model.Notification;
 import com.example.rememberme.model.Person;
+import com.example.rememberme.repository.ImagesRepository;
 import com.example.rememberme.repository.MessageRepository;
 import com.example.rememberme.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -37,10 +41,12 @@ public class MessagesService {
     private final PersonRepository personRepository;
     private final NotificationService notificationService;
     private final BotService botService;
+    private final ImagesRepository imagesRepository;
 
     private long counter = 0;
+    private long imageCounter = 0;
 
-    public MessageRs sendMessages(String textMessage) throws TelegramApiException {
+    public MessageRs sendMessages(String textMessage, MultipartFile image) throws TelegramApiException, IOException {
         Person author = personRepository.findByUsername(authService.getCurrentUsername());
         Message message = new Message();
         message.setId(counter++);
@@ -51,10 +57,24 @@ public class MessagesService {
         message.setTime(new Timestamp(System.currentTimeMillis()));
         message.setAuthorId(author.getId());
         message.setStatus(MessageStatus.SEND);
+        if (image != null) {
+            Long imageId = saveImage(image, message.getId());
+            message.setImageId(imageId);
+        }
         messageRepository.save(message);
         MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, true);
         sendNotification(message);
         return messageRs;
+    }
+
+    private Long saveImage(MultipartFile imageFile, Long id) throws IOException {
+        Image image = new Image();
+        image.setId(imageCounter++);
+        image.setName(imageFile.getOriginalFilename());
+        image.setSize(imageFile.getSize());
+        image.setBytes(imageFile.getBytes());
+        imagesRepository.save(image);
+        return image.getId();
     }
 
     private void sendNotification(Message message) throws TelegramApiException {

@@ -7,8 +7,10 @@ import org.apache.tomcat.util.json.ParseException;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,9 @@ public class MessagesController {
     }
 
     @PostMapping("/messages")
-    public MessageRs sendMessage(@RequestParam String textMessage) throws TelegramApiException {
-        return messagesService.sendMessages(textMessage);
+    public MessageRs sendMessage(@RequestParam String textMessage,
+                                 @RequestParam(required = false) MultipartFile image) throws TelegramApiException, IOException {
+        return messagesService.sendMessages(textMessage, image);
     }
 
     @DeleteMapping("/messages/{id}")

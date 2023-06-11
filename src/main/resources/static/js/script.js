@@ -3,6 +3,8 @@ const mediaQuery = window.matchMedia('(max-width: 768px)');
 let resScroll;
 let scrollHeight;
 let block;
+let tempMessages = [];
+
 getScroll();
 setupBurgerButton();
 becomeMessages();
@@ -29,13 +31,23 @@ function setSendButton() {
     let sendButton = $('#send_button');
     sendButton.click('click', function () {
         let messageField = document.querySelector('#new_message');
-        var token = $("meta[name='_csrf']").attr("content");
+        let token = $("meta[name='_csrf']").attr("content");
+
+        let formData = new FormData();
+        formData.append('textMessage', messageField.value);
+        formData.append('_csrf', token);
+        formData.append('image', $("#add_file_button")[0].files[0]);
+
         $.ajax({
             type: 'POST',
             url: '/messages',
-            data: {textMessage: messageField.value, _csrf : token}
+            contentType: false,
+            processData: false,
+            data: formData
         })
-        setTypingStatus(false);
+        $("#add_file_button").val(null);
+        isTyping = false;
+        setTypingStatus(isTyping);
         getMessages(true);
         messageField.value = "";
     })
@@ -140,6 +152,9 @@ function getMessages(scrollDown) {
         url: '/messages',
         data: {_csrf : token},
         success: function (result) {
+            if (tempMessages.toString() === result.toString()) return;
+            console.log(tempMessages.toString() === result.toString());
+            tempMessages = result;
             $('#messages_block').html(getMessagesHtml(result));
             if (scrollDown) setScroll();
             if (scrollHeight - resScroll >= 20) return;
@@ -169,6 +184,11 @@ function getMessagesHtml(result) {
         if (messageRsItem.income) {
             statusString = "<div class=\"message-status\">" + `${messageRsItem.status}` + "</div>\n"
         }
+        let imagePart = ""
+        if (messageRsItem.imageId !== null) {
+            let imageId = parseInt(messageRsItem.imageId);
+            imagePart = "            <div class='image-holder'><img class='message-image' src='/images/" + imageId +"'></div>"
+        }
 
         messagesHtml += "    <div id=\"" + `${messageRsItem.id}` + "\" class=\"message-holder\">\n" +
             "        <div class=\"message-body " + `${readStatus}` + `${income}` + "\">\n" +
@@ -178,6 +198,7 @@ function getMessagesHtml(result) {
             "                    <p class=\"message-control-item\">Удалить</p>\n" +
             "                </a>\n" +
             "            </div>\n" +
+            imagePart +
             "            <div class=\"message-text\">" + `${messageRsItem.messageText}` + "</div>\n" +
             "            <div class=\"message-date-time\">" + `${messageRsItem.time}` + "</div>\n" +
             statusString             +
