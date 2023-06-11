@@ -33,11 +33,24 @@ a{
     width: 88%;
     bottom: 0;
 }
-#add_file_button:before {
-    content: "Фото";
-    width: 100%;
-    display: inline-block;
-    padding-left: 9px;
+.input__file {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+}
+.input__file-button-text {
+    line-height: 1;
+    margin-top: 1px;
+}
+.input__file-button {
+    background: darkseagreen;
+    width: 75px;
+    height: 45px;
+    font-size: 24px;
+    border-radius: 7px;
+    box-shadow: black 1px 1px 1px;
+    margin: 10px;
+    margin: 0 auto;
 }
 .new_message{
     line-height: 20px;
@@ -154,8 +167,8 @@ a{
 .chatbox__header-info {
     width: 100%;
 }
-.image-holder {
-
+.chatbox__controls {
+    display: flex;
 }
 .message-image {
     max-width: 250px;
@@ -212,6 +225,12 @@ a{
     #add_file_button {
         width: 30px;
     }
+    .input__file-button {
+        width: 25px;
+        margin: 10px;
+        margin-right: 0;
+    }
+
 
 }
 

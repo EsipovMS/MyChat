@@ -36,7 +36,7 @@ function setSendButton() {
         let formData = new FormData();
         formData.append('textMessage', messageField.value);
         formData.append('_csrf', token);
-        formData.append('image', $("#add_file_button")[0].files[0]);
+        formData.append('image', $("#input__file")[0].files[0]);
 
         $.ajax({
             type: 'POST',
@@ -45,7 +45,7 @@ function setSendButton() {
             processData: false,
             data: formData
         })
-        $("#add_file_button").val(null);
+        $("#input__file").val(null);
         isTyping = false;
         setTypingStatus(isTyping);
         getMessages(true);
