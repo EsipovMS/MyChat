@@ -32,8 +32,9 @@ public class MessagesController {
 
     @PostMapping("/messages")
     public MessageRs sendMessage(@RequestParam String textMessage,
+                                 @RequestParam String answeredMessageId,
                                  @RequestParam(required = false) MultipartFile image) throws TelegramApiException, IOException {
-        return messagesService.sendMessages(textMessage, image);
+        return messagesService.sendMessages(textMessage, image, answeredMessageId);
     }
 
     @DeleteMapping("/messages/{id}")

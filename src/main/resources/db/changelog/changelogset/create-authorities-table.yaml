@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_authorities_table
+      author: Michael
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: message_key
+                  name: id
+                  type: BIGSERIAL
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  name: authority
+                  type: VARCHAR(255)
+            tableName: authorities

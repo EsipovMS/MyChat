@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changelogset/create-users-table.yaml
+  - include:
+      file: db/changelog/changelogset/create-messages-table.yaml
+  - include:
+      file: db/changelog/changelogset/create-authorities-table.yaml
+  - include:
+      file: db/changelog/changelogset/truncate-table-users.sql
+  - include:
+      file: db/changelog/changelogset/truncate-table-authorities.sql
+  - include:
+      file: db/changelog/changelogset/insert-test-data.sql
+  - include:
+      file: db/changelog/changelogset/insert-authorities.sql
+
+

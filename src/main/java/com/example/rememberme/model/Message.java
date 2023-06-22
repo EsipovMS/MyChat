@@ -16,4 +16,5 @@ public class Message {
     private Boolean isDelivered;
     private MessageStatus status;
     private Long imageId;
+    private Long answeredMessageId;
 }

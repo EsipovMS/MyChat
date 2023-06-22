@@ -4,13 +4,15 @@ let resScroll;
 let scrollHeight;
 let block;
 let tempMessages = [];
-
-getScroll();
+let answeredMessageId;
+document.onload = setTimeout(setScroll, 1000);
 setupBurgerButton();
 becomeMessages();
 setMessageBlockHeight();
 getChatDetails();
 setSendButton();
+
+setInterval(getChatDetails, 1000);
 
 function getScroll() {
     block = document.querySelector('#messages_block');
@@ -37,6 +39,7 @@ function setSendButton() {
         formData.append('textMessage', messageField.value);
         formData.append('_csrf', token);
         formData.append('image', $("#input__file")[0].files[0]);
+        formData.append('answeredMessageId', answeredMessageId);
 
         $.ajax({
             type: 'POST',
@@ -50,6 +53,7 @@ function setSendButton() {
         setTypingStatus(isTyping);
         getMessages(true);
         messageField.value = "";
+        answeredMessageId = null;
     })
 }
 
@@ -58,10 +62,26 @@ function setControls() {
     $(document).on("click", ".message-controls", function () {
 
         let messageId = this.parentNode.parentNode.id;
-        if (confirm("Действительно хотите удалить сообщение?")) {
-            deleteMessage(messageId);
-            setTimeout(() => getMessages(false), 100);
+        let messageControlsDisplay = this.parentNode.querySelector(".message-controls-display");
+        if (messageControlsDisplay.style.display === 'block') {
+            messageControlsDisplay.style.display = 'none';
+            return;
         }
+        messageControlsDisplay.style.display = 'block';
+        let deleteButton = messageControlsDisplay.querySelector(".deleteButton");
+        let answerButton = messageControlsDisplay.querySelector(".answerButton");
+
+        deleteButton.addEventListener("click", function (event) {
+            if (confirm("Действительно хотите удалить сообщение?")) {
+                deleteMessage(messageId);
+                setTimeout(() => getMessages(false), 100);
+            }
+        });
+
+        answerButton.addEventListener("click", function (event) {
+            answeredMessageId = messageId;
+            messageControlsDisplay.style.display = 'none';
+        });
     })
 }
 
@@ -139,6 +159,11 @@ function getChatDetails() {
         data: {_csrf : token},
         success: function (result) {
             $('.dst_person').html(result.dstPerson.name + " " + result.dstPerson.firstName);
+            let onlineStatus = "";
+            if (result.dstPerson.onlineStatus === true) {
+                onlineStatus = "online";
+            }
+            $('#online_status').html(onlineStatus);
         }
     });
 }
@@ -152,11 +177,11 @@ function getMessages(scrollDown) {
         url: '/messages',
         data: {_csrf : token},
         success: function (result) {
-            if (tempMessages.toString() === result.toString()) return;
-            console.log(tempMessages.toString() === result.toString());
+            if (JSON.stringify(tempMessages) === JSON.stringify(result)) return;
             tempMessages = result;
             $('#messages_block').html(getMessagesHtml(result));
             if (scrollDown) setScroll();
+            getScroll();
             if (scrollHeight - resScroll >= 20) return;
             setScroll();
         }
@@ -190,12 +215,30 @@ function getMessagesHtml(result) {
             imagePart = "            <div class='image-holder'><img class='message-image' src='/images/" + imageId +"'></div>"
         }
 
-        messagesHtml += "    <div id=\"" + `${messageRsItem.id}` + "\" class=\"message-holder\">\n" +
+        let answeredMessagePart = "";
+        if (messageRsItem.answeredMessage !== null) {
+            let ansMessageText = messageRsItem.answeredMessage.messageText;
+            let incomeAnsMessage = "";
+            if (!messageRsItem.income) {
+                incomeAnsMessage = " incomeAnsMessage";
+            }
+            answeredMessagePart = "<div class='answeredMessageHolder" + incomeAnsMessage + "'>" +
+                "<p class='ansMessageLabel'>Ответ на сообщение:</p>" +
+                "<p class='answeredMessageText'>" + ansMessageText + "</p></div>"
+        }
+
+        messagesHtml +=
+
+            "    <div id=\"" + `${messageRsItem.id}` + "\" class=\"message-holder\">\n" +
+            answeredMessagePart +
             "        <div class=\"message-body " + `${readStatus}` + `${income}` + "\">\n" +
             "            <div class=\"message-controls\">&rsaquo;</div>\n" +
             "            <div class=\"message-controls-display\">\n" +
             "                <a href=\"#\">\n" +
-            "                    <p class=\"message-control-item\">Удалить</p>\n" +
+            "                    <p class=\"message-control-item deleteButton\">Удалить</p>\n" +
+            "                </a>\n" +
+            "                <a href=\"#\">\n" +
+            "                    <p class=\"message-control-item answerButton\">Ответить</p>\n" +
             "                </a>\n" +
             "            </div>\n" +
             imagePart +
@@ -210,7 +253,7 @@ function getMessagesHtml(result) {
 }
 
 function becomeMessages() {
-    getMessages(false);
+    getMessages(true);
     setInterval(() => getMessages(false), 1500);
 }
 

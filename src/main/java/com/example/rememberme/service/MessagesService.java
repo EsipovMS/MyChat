@@ -26,10 +26,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +43,7 @@ public class MessagesService {
     private long counter = 0;
     private long imageCounter = 0;
 
-    public MessageRs sendMessages(String textMessage, MultipartFile image) throws TelegramApiException, IOException {
+    public MessageRs sendMessages(String textMessage, MultipartFile image, String answeredMessageId) throws TelegramApiException, IOException {
         Person author = personRepository.findByUsername(authService.getCurrentUsername());
         Message message = new Message();
         message.setId(counter++);
@@ -62,7 +59,12 @@ public class MessagesService {
             message.setImageId(imageId);
         }
         messageRepository.save(message);
-        MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, true);
+        Message answeredMessage = null;
+        if (!Objects.equals(answeredMessageId, "null") && !Objects.equals(answeredMessageId, "undefined")) {
+            message.setAnsweredMessageId(Long.parseLong(answeredMessageId));
+            answeredMessage = messageRepository.findById(Long.parseLong(answeredMessageId));
+        }
+        MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, true, answeredMessage);
         sendNotification(message);
         return messageRs;
     }
@@ -96,13 +98,16 @@ public class MessagesService {
 
     public synchronized List<MessageRs> getMessages() {
         Person me = personRepository.findByUsername(authService.getCurrentUsername());
+        me.setLastOnlineStatusTime(new Timestamp(System.currentTimeMillis()));
+        me.setOnlineStatus(true);
         List<Message> messages = messageRepository.findAll();
         messages.sort(Comparator.comparing(Message::getTime));
         List<MessageRs> messageRsList = new ArrayList<>();
         for (Message message : messages) {
             boolean income;
             income = message.getAuthorId() == me.getId();
-            MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
+            Message answeredMessage = messageRepository.findById(message.getAnsweredMessageId());
+            MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income, answeredMessage);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyy HH:mm");
             messageRs.setTime(formatter.format(message.getTime().toLocalDateTime().plusHours(5)));
             messageRsList.add(messageRs);
@@ -119,7 +124,8 @@ public class MessagesService {
         messageRepository.delete(message);
         boolean income = false;
         if (message.getAuthorId() == 1L) income = false;
-        return MessagesMapper.INSTANCE.toDTO(message, income);
+        Message answeredMessage = messageRepository.findById(message.getAnsweredMessageId());
+        return MessagesMapper.INSTANCE.toDTO(message, income, answeredMessage);
     }
 
     public List<MessageRs> readMessages(String messagesToRead) throws ParseException {
@@ -138,7 +144,8 @@ public class MessagesService {
             Message message = messageRepository.findById(aLong);
             boolean income;
             income = message.getAuthorId() == me.getId();
-            MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income);
+            Message answeredMessage = messageRepository.findById(message.getAnsweredMessageId());
+            MessageRs messageRs = MessagesMapper.INSTANCE.toDTO(message, income, answeredMessage);
             messageRsList.add(messageRs);
         }
         return messageRsList;

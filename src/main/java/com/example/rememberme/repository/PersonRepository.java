@@ -3,14 +3,15 @@ package com.example.rememberme.repository;
 import com.example.rememberme.model.Person;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class PersonRepository {
 
     List<Person> personList = List.of(
-            new Person(1L,"Михаил", "Есипов", "esipov", "123", null),
-            new Person(2L,"Альбина", "Булатова", "bulatova", "123", null)
+            new Person(1L,"Михаил", "Есипов", "esipov", "123", null, false, null),
+            new Person(2L,"Альбина", "Булатова", "bulatova", "123", null, false, null)
             );
 
     public Person findByUsername(String username) {
@@ -43,5 +44,14 @@ public class PersonRepository {
             if (person.getAuthToken().equals(token)) return person;
         }
         return null;
+    }
+
+    public List<Person> findUsersOnline() {
+        List<Person> persons = new ArrayList<>();
+        for (Person person : personList) {
+            if (person.getLastOnlineStatusTime() == null) continue;
+            persons.add(person);
+        }
+        return persons;
     }
 }

@@ -63,6 +63,7 @@ a{
 }
 .message-holder{
     display: flex;
+    flex-flow: column;
 }
 .message-body{
     text-align: right;
@@ -74,6 +75,8 @@ a{
     margin: 5px 10px;
     flex-direction: column;
     position: relative;
+    width: fit-content;
+    min-width: 250px;
 }
 .contact-holder {
     padding: 10px;
@@ -160,6 +163,30 @@ a{
     margin-left: auto;
     display: none;
 }
+.answeredMessageHolder {
+    text-align: right;
+    background-color: #adb5bd9e;
+    padding: 0 30px;
+    margin-bottom: -10px;
+    display: block;
+    width: 250px;
+    margin-left: auto;
+    margin-right: 10px;
+    overflow: hidden;
+    border: 1px solid;
+    border-radius: 3px;
+}
+.ansMessageLabel {
+    margin: 0;
+    text-decoration: underline;
+}
+.answeredMessageText{
+
+}
+.incomeAnsMessage {
+    margin-left: 10px;
+    text-align: left;
+}
 .chatbox__header-burger-button{
     margin-right: 10px;
     display: none;
@@ -183,8 +210,18 @@ a{
     }
     
     .send_button{
-        width: 30px;
+        width: 50px;
         overflow: hidden;
+        padding: 0;
+        border-radius: 40px;
+        font-size: 43px;
+        line-height: 0;
+    }
+    .input__file-button-text {
+        padding: 0;
+        font-size: 43px;
+        font-weight: 700;
+        line-height: 0.9;
     }
     .new_message{
         font-size: 16px;
@@ -226,9 +263,9 @@ a{
         width: 30px;
     }
     .input__file-button {
-        width: 25px;
+        width: 30px;
         margin: 10px;
-        margin-right: 0;
+        margin-right: 2px;
     }
 
 

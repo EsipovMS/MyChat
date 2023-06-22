@@ -18,5 +18,12 @@ public interface MessagesMapper {
     @Mapping(target = "income", source = "income")
     @Mapping(target = "id", source = "message.id")
     @Mapping(target = "status", source = "message.status")
-    MessageRs toDTO(Message message, boolean income);
+    @Mapping(target = "answeredMessage", source = "answeredMessage")
+    @Mapping(target = "messageText", source = "message.messageText")
+    @Mapping(target = "time", source = "message.time")
+    @Mapping(target = "isRead", source = "message.isRead")
+    @Mapping(target = "isDeleted", source = "message.isDeleted")
+    @Mapping(target = "isDelivered", source = "message.isDelivered")
+    @Mapping(target = "imageId", source = "message.imageId")
+    MessageRs toDTO(Message message, boolean income, Message answeredMessage);
 }

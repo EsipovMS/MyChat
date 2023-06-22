@@ -10,7 +10,6 @@ function readMessages() {
             unreadMessages.push(message.parentElement.id);
         }
     });
-    console.log(unreadMessages);
     $.ajax({
         type: 'POST',
         url: '/readMessages',

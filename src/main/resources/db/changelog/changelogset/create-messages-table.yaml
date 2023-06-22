@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_messages_table
+      author: Michael
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: message_key
+                  name: id
+                  type: BIGSERIAL
+              - column:
+                  name: message_text
+                  type: VARCHAR(255)
+              - column:
+                  name: author_id
+                  type: BIGINT
+              - column:
+                  name: time
+                  type: TIMESTAMP
+              - column:
+                  name: is_read
+                  type: BOOLEAN
+              - column:
+                  name: is_deleted
+                  type: BOOLEAN
+              - column:
+                  name: is_delivered
+                  type: BOOLEAN
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  name: image_id
+                  type: BIGINT
+              - column:
+                  name: answered_message_id
+                  type: BIGINT
+            tableName: messages

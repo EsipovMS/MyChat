@@ -1,5 +1,6 @@
 package com.example.rememberme.api;
 
+import com.example.rememberme.model.Message;
 import lombok.Data;
 
 @Data
@@ -13,4 +14,5 @@ public class MessageRs {
     private Boolean isDelivered;
     private MessageStatus status;
     private Long imageId;
+    private Message answeredMessage;
 }
